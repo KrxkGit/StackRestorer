@@ -6,13 +6,7 @@
 name: MSBuild
 
 on:
-  push:
-    branches-ignore:
-        - 'main'
-
-  pull_request:
-    branches-ignore: 
-        - 'main'
+  workflow_call:  # 允许其他工作流调用此工作流
 
 env:
   # Path to the solution file relative to the root of the project.
@@ -56,9 +50,3 @@ jobs:
 
         mv x64/Release/*.exe dist/x64/
         mv Release/*.exe dist/x86/
-        
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4.3.1
-      with:
-        name: StackRestorer
-        path: dist/

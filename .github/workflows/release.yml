@@ -3,16 +3,12 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: MSBuild
+name: PUSH-RELEASE
 
 on:
   push:
-    branches-ignore:
-        - 'main'
-
-  pull_request:
-    branches-ignore: 
-        - 'main'
+    tags:
+      - 'v*'
 
 env:
   # Path to the solution file relative to the root of the project.
@@ -23,30 +19,37 @@ env:
   # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
   BUILD_CONFIGURATION: Release
 
-permissions:
-  contents: read
 
 jobs:
   call-build:
-      uses: ./.github/workflows/msbuild.yml  # 调用构建工作流
+      uses: ./.github/workflows/action.yml
   
   create-release:
     runs-on: windows-latest
-    needs: call-build  # 确保在构建完成后执行
+    needs: call-build
 
     steps:        
-    - name: Create Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
+    - name: Download the file
+      uses: actions/download-artifact@v4
       with:
-        tag: ${{ github.ref }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        name: StackRestorer
+        path: .
 
-    - name: Upload Release Assets
-      uses: softprops/action-gh-release@v1
+    - name: List Downloaded file
+      id: download_files
+      run: |
+        cd ..
+        dir
+        Compress-Archive -Path "./StackRestorer/*" -DestinationPath "./StackRestorer.zip"
+        dir
+        $absolutePath = (Get-Item "./StackRestorer.zip").FullName
+        echo "ZIP_PATH=$absolutePath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
       with:
-        tag: ${{ github.ref }}
-        files: dist/
+        name: Release ${{ github.ref_name }}
+        tag_name: ${{ github.ref }}
+        files: ${{ env.ZIP_PATH }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

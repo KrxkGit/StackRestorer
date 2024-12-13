@@ -9,6 +9,7 @@ const char* VERSION_NUM = "1.0";
 std::list<std::pair<std::string, std::string>> stack_targets;
 std::FILE* input_file = nullptr;
 extern FILE* yyin;
+std::string include_path; // executable 的路径
 
 /**
 添加解析结构到链表中，导出由 bison 调用
@@ -21,7 +22,7 @@ static void exec_restore() {
 	std::ostringstream oss;
 
 	for (const auto& target : stack_targets) {
-		oss << "addr2line -f -e " << target.second << " " << target.first << std::endl;
+		oss << "addr2line -f -e " << include_path + target.second << " " << target.first << std::endl;
 
 		system(oss.str().c_str());
 
@@ -41,11 +42,13 @@ int run_core() {
 }
 
 static void print_help() {
-	std::cout << "用法:" << PROGRAM_NAME << " [-h | -v][-i 输入文件]" << std::endl
+	std::cout << "用法:" << PROGRAM_NAME << " [-h|-v] [-i 输入文件] [-I 可执行文件包含目录]" << std::endl
 		<< "选项:" << std::endl
 		<< "  -h, --help    显示帮助信息" << std::endl
 		<< "  -v, --version 显示版本信息" << std::endl
-		<< "  -i, --input   指定输入文件" << std::endl;
+		<< "  -i, --input   指定输入文件" << std::endl
+		<< "  -I, --include 指定可执行文件包含目录" << std::endl
+		;
 }
 
 static void print_version() {
@@ -60,6 +63,13 @@ static void set_input(const char* input_file_name) {
 		exit(1);
 	}
 	yyin = input_file;
+}
+
+static void setIncludePath(const char* path) {
+	include_path = std::string(path);
+	if (!include_path.empty()) {
+		include_path += "/";
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -78,6 +88,13 @@ int main(int argc, char* argv[]) {
 				return 1;
 			}
 			set_input(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-I") == 0 || strcmp(argv[i], "--include") == 0) {
+			if (i + 1 >= argc) {
+				std::cerr << "缺少包含目录名\n";
+				return 1;
+			}
+			setIncludePath(argv[++i]);
 		}
 		else {
 			std::cerr << "未知选项： " << argv[i] << std::endl;

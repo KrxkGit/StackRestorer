@@ -11,8 +11,8 @@
 ### 前置条件
 
 - 本项目采用 Visual Studio 2022 IDE 完成构建。
-- 构建环境为 Windows，依赖于 [win_flex_bison](https://sourceforge.net/projects/winflexbison/) 。使用 Visual Studio 构建前请根据 [win_flex_bison](https://sourceforge.net/projects/winflexbison/) 文档在 Visual Studio 项目中添加 **生成自定义** 选项。
-- 添加 **生成自定义** 选项完成后可利用 Visual Studio IDE 完成一键构建。
+- 构建环境为 Windows，依赖于 [win_flex_bison](https://sourceforge.net/projects/winflexbison/) 。使用 Visual Studio 构建前请根据 [win_flex_bison](https://sourceforge.net/projects/winflexbison/) 文档在 Visual Studio 项目中添加 **生成自定义** 选项。（本项目已附带）
+- 添加 **生成自定义** 选项完成后可利用 Visual Studio IDE 完成一键构建。（本项目已配置）
 
 ### 构建方法
 

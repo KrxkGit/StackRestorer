@@ -48,7 +48,7 @@ jobs:
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        name: Release ${{ github.ref_name }}
+        name: StackRestorer ${{ github.ref_name }}
         tag_name: ${{ github.ref }}
         files: ${{ env.ZIP_PATH }}
       env:
